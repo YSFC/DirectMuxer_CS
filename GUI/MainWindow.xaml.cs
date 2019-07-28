@@ -1,0 +1,324 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.IO;
+using System.Configuration;
+using SWF = System.Windows.Forms; 
+
+namespace DM_CS.GUI
+{
+    /// <summary>
+    /// MainWindow.xaml 的交互逻辑
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Load(object sender, RoutedEventArgs e)
+        {
+            dm_CreateGroup(sender, e);
+            dm_CreateGroup(sender, e);
+            dm_DirListView.ItemsSource = GlobalScheme.DirListView.OCKeys;
+            StatusPrint("就绪");
+        }
+
+        internal void ErrorPrint(string Title, string Msg)
+        {
+            var EOW = new ErrorOrWarning();
+            EOW.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            EOW.Owner = this;
+            EOW.ChangeTitle(Title);
+            EOW.ChangeText(Msg);
+            EOW.ShowInTaskbar = false;
+            EOW.ShowDialog();
+            EOW.Close();
+        }
+
+        internal void AboutBoxOpen(object sender, RoutedEventArgs e)
+        {
+            var AboutBoxWin = new AboutBox();
+            AboutBoxWin.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            AboutBoxWin.Owner = this;
+            AboutBoxWin.ShowDialog();
+            AboutBoxWin.Close();
+        }
+
+        private void button_ClearAll(object sender, RoutedEventArgs e)
+        {
+            GlobalScheme.GroupID = 0;
+            GlobalScheme.GroupDictList.Clear();
+            GroupDock.Children.Clear();
+            RegexDock.Children.Clear();
+            GlobalScheme.DirListView.Clear();
+            GlobalScheme.MergerComboSelect = "0";
+            RegexMatchAll.FilesOfKey.Clear();
+            RegexMatchAll.MatchFiles.Clear();
+            RegexMatchAll.MergeSchemeList.Clear();
+            regex_TextBox.Clear();
+            dir_TextBox.Clear();
+            this.Width = 800;
+            this.Height = 450;
+            ChangeGroupSize();
+            Load(sender, e);
+        }
+
+        public void StatusPrint(string text)
+        {
+            Dispatcher.Invoke(() => { StatusBarTextBlock.Text = text.Trim(); });
+        }
+
+        private void button_Merge(object sender, RoutedEventArgs e)
+        {
+            if (GlobalScheme.IsRegexMode)
+            {
+                foreach(var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x=>x))
+                {
+                    var merger_lists = new List<string[]>();
+                    foreach (var groupID in RegexMatchAll.MergeSchemeList[itemKey].Keys.OrderBy(x => x))
+                    {
+                        var tempStrings = RegexMatchAll.MergeSchemeList[itemKey][groupID];
+                        merger_lists.Add(tempStrings);
+                    }
+                    Merger(merger_lists);
+                }
+            }
+            else
+            {
+                var merger_lists = new List<string[]>();
+                foreach (var group in GlobalScheme.GroupDictList)
+                {
+                    var tempStrings = group.Value.Dict.Values.ToArray();
+                    merger_lists.Add(tempStrings);
+                }
+                Merger(merger_lists);
+            }
+        }
+
+        private void box_MergerStyleChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem getCB = mergerComboBox.SelectedItem as ComboBoxItem;
+            GlobalScheme.MergerComboSelect = getCB.Tag.ToString();
+        }
+
+        private void DropOfDirLV(object sender, DragEventArgs e)
+        {
+            StatusPrint("不允许拖入。");
+        }
+
+        private void dm_FileDialog(object sender, RoutedEventArgs e)
+        {
+            SWF.FolderBrowserDialog dialog = new SWF.FolderBrowserDialog();
+            dialog.Description = "请选择文件路径";
+            if (dialog.ShowDialog() == SWF.DialogResult.OK)
+            {
+                GlobalScheme.DirListView.Clear();
+                string foldPath = dialog.SelectedPath;
+                var files = Directory.GetFiles(foldPath);
+                foreach (var file in files) {
+                    GlobalScheme.DirListView.Add(Path.GetFileName(file),file);
+                }
+                dir_TextBox.Text = foldPath;
+                //SWF.MessageBox.Show("已选择文件夹:" + foldPath, "选择文件夹提示", SWF.MessageBoxButtons.OK, SWF.MessageBoxIcon.Information);
+            }
+        }
+
+        private void button_regexMain(object sender, RoutedEventArgs e)
+        {
+            if (!GlobalScheme.IsRegexMode)
+            {
+                StatusPrint("未启用正则模式。");
+                return;
+            }
+            try
+            {
+                var mainRe = new Regex(regex_TextBox.Text,RegexOptions.IgnoreCase);
+
+                //清空全部匹配
+                RegexMatchAll.MatchFiles.Clear();
+                RegexMatchAll.FilesOfKey.Clear();
+                RegexMatchAll.MergeSchemeList.Clear();
+
+                foreach (var filename in GlobalScheme.DirListView.Keys)
+                {                    
+                    var tempMatch = mainRe.Match(filename);
+                    if (!tempMatch.Success)
+                        continue;
+                    //成功匹配都塞捕获文件列表里面
+                    RegexMatchAll.MatchFiles.Add(filename, GlobalScheme.DirListView[filename]);
+
+                    //不知道用Groups去做key会发生什么事情，还是转换成string吧
+                    var matchKey = "";
+                    for(var j = 1;j < tempMatch.Groups.Count;j++)
+                    {
+                        matchKey += tempMatch.Groups[j] + "|";
+                    }
+                   
+                    //不存在先建立
+                    if (!RegexMatchAll.FilesOfKey.ContainsKey(matchKey))
+                    {
+                        RegexMatchAll.FilesOfKey.Add(matchKey, new List<string>());
+                    }
+                    if (!RegexMatchAll.MergeSchemeList.ContainsKey(matchKey))
+                    {
+                        RegexMatchAll.MergeSchemeList.Add(matchKey, new Dictionary<int, string[]>());
+                    }
+
+                    //不用于任何显示，直接用raw path
+                    RegexMatchAll.FilesOfKey[matchKey].Add(GlobalScheme.DirListView[filename]);                    
+                }
+
+                foreach (var buttonR in RegexDock.Children)
+                {
+                    if (buttonR is Button)
+                        (buttonR as Button).RaiseEvent(e);
+                }
+
+                StatusPrint(string.Format("成功匹配{0}个文件", RegexMatchAll.MatchFiles.Count()));
+            }
+            catch(ArgumentException A)
+            {
+                StatusPrint("错误的正则表达式：" + A.Message);
+            }
+        }
+
+        private void toNormalMode(object sender, RoutedEventArgs e)
+        {
+            GlobalScheme.IsRegexMode = false;
+            foreach(ListView i in GroupDock.Children)
+            {
+                i.AllowDrop = true;
+            }
+            foreach (var i in GlobalScheme.GroupDictList.Values)
+            {
+                i.Dict.Clear();
+            }
+            RegexMatchAll.MatchFiles.Clear();
+            RegexMatchAll.FilesOfKey.Clear();
+            RegexMatchAll.MergeSchemeList.Clear();
+        }
+
+        private void toRegexMode(object sender, RoutedEventArgs e)
+        {
+            GlobalScheme.IsRegexMode = true;
+            foreach (ListView i in GroupDock.Children)
+            {
+                i.AllowDrop = false;
+            }
+            foreach (var i in GlobalScheme.GroupDictList.Values)
+            {
+                i.Dict.Clear();
+            }
+
+        }
+
+        private void EvDirTBKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {                
+                string foldPath = dir_TextBox.Text;                
+                if (Directory.Exists(foldPath))
+                {
+                    GlobalScheme.DirListView.Clear();
+                    var files = Directory.GetFiles(foldPath);
+                    foreach (var file in files)
+                    {
+                        GlobalScheme.DirListView.Add(Path.GetFileName(file), file);
+                    }
+                }
+                else
+                {
+                    StatusPrint("错误的路径。");
+                }
+            }
+        }
+
+        private void Exit(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void EvClearAllGroupMI(object sender, RoutedEventArgs e)
+        {
+            foreach(var i in GlobalScheme.GroupDictList)
+            {
+                i.Value.Dict.Clear();
+            }
+        }
+
+        private void SaveSettings(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            PictureCore.Scheme.Save();
+        }
+
+        private void EvSetMI(object sender, RoutedEventArgs e)
+        {
+            var MSetWin = new SetWin();
+            MSetWin.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            MSetWin.Owner = this;
+            MSetWin.ShowInTaskbar = false;
+            MSetWin.ShowDialog();
+            MSetWin.Close();
+        }
+
+
+        /*private void btnFile_Click(object sender, EventArgs e)
+        {
+            //OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = true;
+            fileDialog.Title = "请选择文件";
+            fileDialog.Filter = "所有文件(*.*)|*.*";
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string file = fileDialog.FileName;
+                //MessageBox.Show("已选择文件:" + file, "选择文件提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void btnPath_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.Description = "请选择文件路径";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string foldPath = dialog.SelectedPath;
+                MessageBox.Show("已选择文件夹:" + foldPath, "选择文件夹提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        */
+        /*public class TestEntity : INotifyPropertyChanged
+        {
+            private string _surname;
+            private string _file;
+
+            public string Surname
+            {
+                get { return _surname; }
+                set { _surname = value; OnPropertyChanged("Surname"); }
+            }
+            public string File
+            {
+                get { return _file; }
+                set { _file = value; OnPropertyChanged("File"); }
+            }
+
+            protected void OnPropertyChanged(string propertyName)
+            {
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+        }*/
+
+    }
+
+
+
+}
