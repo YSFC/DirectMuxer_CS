@@ -1,9 +1,7 @@
 N:\VS2015_P\DM_CS\PictureCore\bin\Release\PictureCore.dll
-N:\VS2015_P\DM_CS\PictureCore\bin\Release\PictureCore.pdb
 N:\VS2015_P\DM_CS\PictureCore\bin\Release\Magick.NET-Q8-AnyCPU.dll
 N:\VS2015_P\DM_CS\PictureCore\bin\Release\Magick.NET-Q8-AnyCPU.xml
+N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.csprojAssemblyReference.cache
 N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.csproj.CoreCompileInputs.cache
 N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.csproj.CopyComplete
 N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.dll
-N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.pdb
-N:\VS2015_P\DM_CS\PictureCore\obj\Release\PictureCore.csprojAssemblyReference.cache

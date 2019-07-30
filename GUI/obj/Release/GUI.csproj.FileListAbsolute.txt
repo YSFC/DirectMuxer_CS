@@ -26,7 +26,6 @@ N:\VS2015_P\DM_CS\WpfApp1\obj\Release\SetWin.g.cs
 N:\VS2015_P\DM_CS\WpfApp1\obj\Release\SetWin.baml
 N:\VS2015_P\DM_CS\bin\Release\DM_CS.exe.config
 N:\VS2015_P\DM_CS\bin\Release\DM_CS.exe
-N:\VS2015_P\DM_CS\bin\Release\DM_CS.pdb
 N:\VS2015_P\DM_CS\GUI\obj\Release\GUI.csprojAssemblyReference.cache
 N:\VS2015_P\DM_CS\GUI\obj\Release\AboutBox.g.cs
 N:\VS2015_P\DM_CS\GUI\obj\Release\ErrorOrWarning.g.cs
@@ -45,4 +44,3 @@ N:\VS2015_P\DM_CS\GUI\obj\Release\GUI.csproj.GenerateResource.cache
 N:\VS2015_P\DM_CS\GUI\obj\Release\GUI.csproj.CoreCompileInputs.cache
 N:\VS2015_P\DM_CS\GUI\obj\Release\GUI.csproj.CopyComplete
 N:\VS2015_P\DM_CS\GUI\obj\Release\DM_CS.exe
-N:\VS2015_P\DM_CS\GUI\obj\Release\DM_CS.pdb

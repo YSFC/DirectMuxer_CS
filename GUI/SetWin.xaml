@@ -7,30 +7,31 @@
         mc:Ignorable="d"
         Title="Set" Height="300" Width="500" ResizeMode="NoResize" Loaded="EvLoad">
     <Grid Background="#FFE6E6E6">
-        <TabControl x:Name="tabControl" TabStripPlacement="Left" Background="{x:Null}" Margin="0,0,2,0">
+        <TabControl x:Name="tabControl" TabStripPlacement="Left" Background="{x:Null}" Margin="0,0,2,40">
             <TabItem Header="Main" Height="30">
                 <Grid Background="#FFE5E5E5">
-                    <ComboBox x:Name="OutFormatCB" HorizontalAlignment="Left" Margin="230,143,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="EvFormatChanged">
+                    <ComboBox x:Name="OutFormatCB" HorizontalAlignment="Left" Margin="230,143,0,0" VerticalAlignment="Top" Width="120">
                         <ComboBoxItem Content="BMP" Tag="0"/>
                         <ComboBoxItem Content="PNG" Tag="1"/>
                         <ComboBoxItem Content="JPG" Tag="2"/>
                     </ComboBox>
                     <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="117,143,0,0" TextWrapping="Wrap" Text="Output Format:" VerticalAlignment="Top" Height="22"/>
                     <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="38,24,0,0" TextWrapping="Wrap" Text="放弃排版中" VerticalAlignment="Top" Height="21"/>
-                    <ComboBox x:Name="OffsetModeCB" HorizontalAlignment="Left" Margin="230,109,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="EvOffsetModeChanged">
+                    <ComboBox x:Name="OffsetModeCB" HorizontalAlignment="Left" Margin="230,109,0,0" VerticalAlignment="Top" Width="120">
                         <ComboBoxItem Content="Normal" Tag="0"/>
                         <ComboBoxItem Content="POS" Tag="1"/>
                     </ComboBox>
                     <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="124,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="坐标规则"/>
                     <TextBox x:Name="ColorKey" HorizontalAlignment="Left" Height="23" Margin="230,69,0,0" TextWrapping="Wrap" Text="#FFFFFF" VerticalAlignment="Top" Width="120"/>
                     <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="124,72,0,0" TextWrapping="Wrap" Text="T模式颜色" VerticalAlignment="Top"/>
+                    <Button x:Name="button1" Content="C" HorizontalAlignment="Left" Margin="364,72,0,0" VerticalAlignment="Top" Width="30" Click="EvColorChooseClick"/>
                 </Grid>
             </TabItem>
             <TabItem Header="OutPath" Height="30">
                 <Grid Background="#FFE5E5E5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="65*"/>
-                        <RowDefinition Height="197*"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="378*"/>
@@ -42,6 +43,8 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Button x:Name="button_SetOK" Content="OK" HorizontalAlignment="Left" Margin="339,232,0,0" VerticalAlignment="Top" Width="60" Click="OKClick"/>
+        <Button x:Name="button_Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="404,232,0,0" VerticalAlignment="Top" Width="60" Click="CancelClick"/>
 
     </Grid>
 </Window>

@@ -129,14 +129,23 @@ namespace DM_CS.PictureCore
                     return;
             }
             
+            //如果未能匹配都为0好了
             var ma = re.Match(FileName);
-            m_offset[0] = int.Parse(ma.Groups[1].Value);
-            m_offset[1] = int.Parse(ma.Groups[2].Value);
-            if (replaceString != null)
+            if (ma.Success)
             {
-                var ttt = string.Format(replaceString, m_offset[0], m_offset[1]);
-                this.m_filename = this.m_filename.Replace(ttt, "");
+                m_offset[0] = int.Parse(ma.Groups[1].Value);
+                m_offset[1] = int.Parse(ma.Groups[2].Value);
+                if (replaceString != null)
+                {
+                    var ttt = string.Format(replaceString, m_offset[0], m_offset[1]);
+                    this.m_filename = this.m_filename.Replace(ttt, "");
 
+                }
+            }
+            else
+            {
+                m_offset[0] = 0;
+                m_offset[1] = 0;
             }
         }
 
