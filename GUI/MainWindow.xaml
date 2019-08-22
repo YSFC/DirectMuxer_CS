@@ -25,7 +25,7 @@
                 <MenuItem x:Name="ClearAllGroup" Header="Group Clear" Click="EvClearAllGroupMI"/>
                 <MenuItem IsChecked="True" Header="禁用alpha预乘(暂时无用)" IsCheckable="True"/>
                 <Separator/>
-                <MenuItem Header="待添加"/>
+                <MenuItem x:Name="openPicturePreview_MeanItem" Header="Open picture preview" IsCheckable="True" Checked="OpenPicturePreview"/>
             </MenuItem>
             <MenuItem Header="About" Click="AboutBoxOpen"/>
         </Menu>

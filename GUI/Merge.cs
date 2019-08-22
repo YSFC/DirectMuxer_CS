@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows;
 using DM_CS.PictureCore;
 
@@ -8,7 +9,12 @@ namespace DM_CS.GUI
 {
     public partial class MainWindow : Window
     {
-        public int Merger(List<string[]> merger_lists)
+        /// <summary>
+        /// 用合成列表来合成图片
+        /// </summary>
+        /// <param name="merger_lists"></param>
+        /// <returns></returns>
+        internal int Merger(List<string[]> merger_lists)
         {            
             var merger_pics_list = new List<List<string>>();
             foreach(var basePic in merger_lists[0])
@@ -40,7 +46,14 @@ namespace DM_CS.GUI
             return 1;
         }
 
-        public List<List<string>> ListXList(List<List<string>> allMergeList, string[] addList, bool MustNeed)
+        /// <summary>
+        /// 列表交叉，达到直积的效果
+        /// </summary>
+        /// <param name="allMergeList"></param>
+        /// <param name="addList"></param>
+        /// <param name="MustNeed">是否必须使用</param>
+        /// <returns></returns>
+        internal List<List<string>> ListXList(List<List<string>> allMergeList, string[] addList, bool MustNeed)
         {
             var ReturnList = new List<List<string>>();
             foreach (var aList in allMergeList)
@@ -59,5 +72,34 @@ namespace DM_CS.GUI
             }
             return (ReturnList);
         }
+
+        /// <summary>
+        /// 预览图合成
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal void PreviewMerger(object sender, SelectionChangedEventArgs e)
+        {
+            //如果预览图窗口没打开，不需要处理。
+            if (GlobalScheme.PicturePreviewWindow == null)
+                return;
+
+            var previewMergerList = new List<string>();
+            foreach(var i in GlobalScheme.GroupDictList.Values.OrderBy(x => x.ID))
+            {
+                var tempImage = i.MyControl.SelectedItems;
+                if (tempImage == null || tempImage.Count == 0)
+                    continue;
+                previewMergerList.Add(i.Dict[tempImage[0].ToString()]);                
+            }
+
+            if (previewMergerList.Count != 0)
+            {
+                var outPic = PicMerger.MergerOfStrings(previewMergerList.ToArray());
+                GlobalScheme.PreviewBS = outPic.GetBitmap();
+                GlobalScheme.PicturePreviewWindow.RefreshImage();
+            }
+        }
+
     }
 }

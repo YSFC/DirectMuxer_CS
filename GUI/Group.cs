@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.IO;
 
@@ -22,6 +23,7 @@ namespace DM_CS.GUI
 
             var tempGroup = new MyGourp(GlobalScheme.GroupID);
             tempGroup.MyControl.Drop += GroupDrop;
+            tempGroup.MyControl.SelectionChanged += PreviewMerger;
             tempGroup.MyTB_Button.Click += ClickR;
             //listview
             Thickness tempMargin = tempGroup.MyControl.Margin;
@@ -201,6 +203,7 @@ namespace DM_CS.GUI
             this.MyControl.Tag = ID;
             this.MyControl.ItemsSource = this.Dict.OCKeys;
             this.MyControl.DragEnter += dm_GroupEnter;
+            this.MyControl.MouseLeftButtonDown += listview_mouseup;            
             this.MyTB = new TextBox();
             this.MyTB.Tag = ID;
             this.MyTB_Button = new Button();
@@ -252,8 +255,11 @@ namespace DM_CS.GUI
             this.Dict.Clear();
         }
 
+        private void listview_mouseup(object sender, MouseButtonEventArgs e)
+        {
+            this.MyControl.SelectedIndex = -1;
+        }
     }
-
     /// <summary>
     /// Group专用
     /// </summary>

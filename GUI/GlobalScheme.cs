@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DM_CS.GUI
 {
@@ -14,17 +16,29 @@ namespace DM_CS.GUI
         //只能加不能减
         public static int GroupID = 0;
 
+        //Group的焦点，用来记录最后活动的Group
         public static int FoucsGourpID = 0;
 
+        //合成模式选项
         public static string MergerComboSelect = "0";
 
+        //Group的控件都装在这个字典内，有几个Group这字典内就有几个元素
         public static Dictionary<int, MyGourp> GroupDictList = new Dictionary<int, MyGourp>();
 
+        //允许的图片后缀，在导入IM库后可以增加许多支持，比如PSD、webp什么的。
         public static string[] AllowExt = new string[] { ".bmp", ".jpg", ".png" };
 
+        //文件夹下全部文件，用于最左边的ListView的显示和合成时的快速获取文件名。
         public static MyGourpDict DirListView = new MyGourpDict();
 
+        //正则合成模式的状态
         public static bool IsRegexMode = false;
+
+        //图片预览窗口，平时应该为null，活动时才是一个PicturePreview类
+        public static PicturePreview PicturePreviewWindow = null;
+
+        //图片预览窗口所使用的BitmapSource，初始应与图片控件绑定
+        public static BitmapSource PreviewBS;
 
     }
 

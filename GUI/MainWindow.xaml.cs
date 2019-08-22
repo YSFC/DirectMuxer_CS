@@ -239,11 +239,21 @@ namespace DM_CS.GUI
             }
         }
 
+        /// <summary>
+        /// 关闭主窗口
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Exit(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// 清空全部Group内元素
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EvClearAllGroupMI(object sender, RoutedEventArgs e)
         {
             foreach(var i in GlobalScheme.GroupDictList)
@@ -252,8 +262,18 @@ namespace DM_CS.GUI
             }
         }
 
+        /// <summary>
+        /// 保存设置
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveSettings(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (GlobalScheme.PicturePreviewWindow != null && GlobalScheme.PicturePreviewWindow.IsVisible)
+            {
+                GlobalScheme.PicturePreviewWindow.Close();
+            }
+
             PictureCore.Scheme.Save();
         }
 
@@ -267,6 +287,26 @@ namespace DM_CS.GUI
             MSetWin.Close();
         }
 
+
+        public void PicturePreviewWinClosed(object sender, EventArgs e)
+        {
+            //关闭窗口时刷新父窗口状态
+            openPicturePreview_MeanItem.IsChecked = false;
+        }
+
+        private void OpenPicturePreview(object sender, RoutedEventArgs e)
+        {
+            GlobalScheme.PicturePreviewWindow = new PicturePreview();
+            GlobalScheme.PicturePreviewWindow.Closed += PicturePreviewWinClosed;
+            GlobalScheme.PicturePreviewWindow.Show();   
+        }
+
+        private void ClosePicturePreview(object sender, RoutedEventArgs e)
+        {
+            GlobalScheme.PicturePreviewWindow.Close();
+            GlobalScheme.PicturePreviewWindow = null;
+            //openPicturePreview_MeanItem.IsChecked = false;
+        }
 
         /*private void btnFile_Click(object sender, EventArgs e)
         {

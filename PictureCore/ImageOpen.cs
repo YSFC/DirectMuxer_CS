@@ -164,6 +164,12 @@ namespace DM_CS.PictureCore
             }
         }
 
+        public BitmapSource GetBitmap()
+        {
+            var outBit = m_pic.ToBitmapSource();
+            return outBit;
+        }
+
         #region Dispose
         bool m_disposed = false;
 

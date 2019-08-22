@@ -29,6 +29,8 @@ namespace DM_CS.GUI
             this.Close();
         }
 
+        //没有采用构造函数，而是用两个普通函数处理是为了方便看
+        //反正这个窗体用不了多少次？
         public void ChangeTitle(string title)
         {
             this.Title = title;
