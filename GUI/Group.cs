@@ -247,7 +247,8 @@ namespace DM_CS.GUI
             var tempMI1 = new MenuItem();
             tempMI1.Header = "删除";
             tempCM.Items.Add(tempMI1);
-            var tempMI2 = new MenuItem();
+			tempMI1.Click += mi_Remove;
+			var tempMI2 = new MenuItem();
             tempMI2.Header = "清空";
             tempMI2.Click += mi_Clear;
             tempCM.Items.Add(tempMI2);
@@ -270,7 +271,16 @@ namespace DM_CS.GUI
             this.Dict.Clear();
         }
 
-        private void listview_mouseup(object sender, MouseButtonEventArgs e)
+		//删除 选项
+		private void mi_Remove(object sender, RoutedEventArgs e)
+		{
+			foreach(var key in this.MyControl.SelectedItems.Cast<string>().ToList())
+			{
+				this.Dict.Remove(key);
+			}
+		}
+
+		private void listview_mouseup(object sender, MouseButtonEventArgs e)
         {
             this.MyControl.SelectedIndex = -1;
         }
@@ -294,7 +304,13 @@ namespace DM_CS.GUI
             base.Clear();
             OCKeys.Clear();
         }
-    }
+
+		public new void Remove(string key)
+		{
+			base.Remove(key);
+			OCKeys.Remove(key);
+		}
+	}
 
     [Serializable]
     public class ExistsInGroupException : Exception
