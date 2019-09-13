@@ -10,3 +10,7 @@ GUI/obj/
 GUI/bin/
 PictureCore/obj/
 PictureCore/bin/
+*.7z
+Test/
+bin/
+.vs/
