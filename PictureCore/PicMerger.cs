@@ -14,11 +14,6 @@ namespace DM_CS.PictureCore
 {
     public static class PicMergerCore
     {
-        public static ImageOpen Alpha(ImageOpen Base, ImageOpen Diff)
-        {
-            return Alpha(Base, Diff, 0, 0);
-        }
-
         /// <summary>
         /// alpha合成图像，返回的图像继承Base的坐标，并将文件名以连接符连接。
         /// </summary>
@@ -34,11 +29,6 @@ namespace DM_CS.PictureCore
             var out_name = Path.Combine(Scheme.OutputDir, Path.GetFileNameWithoutExtension(Base.FileName));
             out_name += Scheme.JoinScheme + Path.GetFileName(Diff.FileName);
             return new ImageOpen(out_pic,Base.OffsetXY, out_name);
-        }
-        
-        public static ImageOpen Color(ImageOpen Base, ImageOpen Diff)
-        {
-            return Color(Base, Diff, 0, 0);
         }
 
         /// <summary>
@@ -64,12 +54,6 @@ namespace DM_CS.PictureCore
             return new ImageOpen(out_pic, Base.OffsetXY, out_name);
         }
 
-        public static ImageOpen Override(ImageOpen Base, ImageOpen Diff)
-        {
-            return Override(Base, Diff, 0, 0);
-        }
-
-
         /// <summary>
         /// Opaque Override(但不含坐标预测)
         /// </summary>
@@ -92,6 +76,15 @@ namespace DM_CS.PictureCore
 
     public static class PicMerger
     {
+		/// <summary>
+		/// 这个可能放弃使用
+		/// </summary>
+		/// <param name="basePic"></param>
+		/// <param name="diffPic"></param>
+		/// <param name="merger_scheme"></param>
+		/// <param name="offset_x"></param>
+		/// <param name="offset_y"></param>
+		/// <returns></returns>
         public static ImageOpen Merger(ImageOpen basePic, ImageOpen diffPic,int merger_scheme, int offset_x, int offset_y)
         {
             ImageOpen outPic;
@@ -102,19 +95,10 @@ namespace DM_CS.PictureCore
                     outPic = PicMergerCore.Alpha(basePic, diffPic, offset_x, offset_y);
                     break;
                 case 2:
-                    outPic = PicMergerCore.Alpha(basePic, diffPic);
-                    break;
-                case 3:
                     outPic = PicMergerCore.Color(basePic, diffPic, offset_x, offset_y);
                     break;
-                case 4:
-                    outPic = PicMergerCore.Color(basePic, diffPic);
-                    break;
-                case 5:
+                case 3:
                     outPic = PicMergerCore.Override(basePic, diffPic, offset_x, offset_y);
-                    break;
-                case 6:
-                    outPic = PicMergerCore.Override(basePic, diffPic);
                     break;
                 default:
                     outPic = null;
@@ -124,7 +108,41 @@ namespace DM_CS.PictureCore
             return outPic;
         }
 
-        public static ImageOpen MergerOfStrings(string[] merge_list)
+
+		/// <summary>
+		/// 输入两张图片，得到的是合成后的图片。
+		/// 返回图片由clone生成，不影响源图。
+		/// </summary>
+		/// <param name="basePic"></param>
+		/// <param name="diffPic"></param>
+		/// <param name="merger_scheme"></param>
+		/// <returns></returns>
+		public static ImageOpen Merger(ImageOpen basePic, ImageOpen diffPic, int merger_scheme)
+		{
+			ImageOpen outPic;
+			var offset_x = diffPic.OffsetXY[0] - basePic.OffsetXY[0];
+			var offset_y = diffPic.OffsetXY[1] - basePic.OffsetXY[1];
+			
+			switch (merger_scheme)
+			{
+				case 1:
+					outPic = PicMergerCore.Alpha(basePic, diffPic, offset_x, offset_y);
+					break;
+				case 2:
+					outPic = PicMergerCore.Color(basePic, diffPic, offset_x, offset_y);
+					break;
+				case 3:
+					outPic = PicMergerCore.Override(basePic, diffPic, offset_x, offset_y);
+					break;
+				default:
+					outPic = null;
+					break;
+			}
+
+			return outPic;
+		}
+
+		public static ImageOpen MergerOfStrings(string[] merge_list)
         {
             var basePic = new ImageOpen(merge_list[0]);
             bool FirstSW = true;

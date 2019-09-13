@@ -1,0 +1,12 @@
+
+*.exe
+*.dll
+*.pdb
+*.cache
+*.lref
+*.baml
+packages/
+GUI/obj/
+GUI/bin/
+PictureCore/obj/
+PictureCore/bin/

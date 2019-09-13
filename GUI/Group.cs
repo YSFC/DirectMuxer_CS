@@ -12,6 +12,12 @@ namespace DM_CS.GUI
 {
     public partial class MainWindow : Window
     {
+		/// <summary>
+		/// CreateGroup按钮的具体实现。
+		/// 这个实现是在容器里面加入。
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void dm_CreateGroup(object sender, RoutedEventArgs e)
         {
             //Width先加个多少？  
@@ -123,6 +129,11 @@ namespace DM_CS.GUI
         }
 
 
+		/// <summary>
+		/// 正则合成的预处理
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         public void ClickR(object sender, RoutedEventArgs e)
         {
             //StatusPrint(e.ToString());
@@ -181,6 +192,10 @@ namespace DM_CS.GUI
     {
 
         public int ID { get; }
+
+		/// <summary>
+		/// 自定义的组字典
+		/// </summary>
         public MyGourpDict Dict { get; set; }
         public ListView MyControl { get; }
         public TextBox MyTB { get; }

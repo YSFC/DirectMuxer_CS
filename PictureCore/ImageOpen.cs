@@ -92,6 +92,12 @@ namespace DM_CS.PictureCore
             return (MagickImage)m_pic.Clone();
         }
 
+		public ImageOpen Clone()
+		{
+			var returnIO = new ImageOpen(this.CopyPic(),this.OffsetXY,this.m_filename);
+			return (returnIO);
+		}
+
         /// <summary>
         /// 这个主要是计算图片如果以Bitmap形式在内存中的占用空间，但并不准确
         /// </summary>

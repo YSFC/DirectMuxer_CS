@@ -97,10 +97,7 @@ namespace DM_CS.PictureCore
         /// Alpha
         /// </summary>
         public static int Alpha { get { return 1; } }
-        public static int AlphaWhitoutPos { get { return 2; } }
-        public static int Color { get { return 3; } }
-        public static int ColorWhitoutPos { get { return 4; } }
-        public static int Override { get { return 5; } }
-        public static int OverrideWhitoutPos { get { return 6; } }
+        public static int Color { get { return 2; } }
+        public static int Override { get { return 3; } }
     }
 }

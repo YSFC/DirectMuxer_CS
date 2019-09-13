@@ -101,5 +101,51 @@ namespace DM_CS.GUI
             }
         }
 
-    }
+		/// <summary>
+		/// 列表交叉并合成，不出意外应该是最好的方法
+		/// </summary>
+		/// <param name="merger_lists">需要处理的文件组的列表</param>
+		/// <param name="needListLen">需要处理的列表数量，主要是内部迭代用。</param>
+		internal void ListXListAndMerge(List<string[]> merger_lists,int needListLen,ImageOpen inputImage = null)
+		{
+			if(needListLen < 1)
+			{
+				//needListLen必定大于等于1，不然就是index超出范围
+				throw new IndexOutOfRangeException("卧槽怎么做到0个group合成的？");
+			}
+
+			
+			foreach (var file in merger_lists[merger_lists.Count - needListLen])
+			{
+				ImageOpen baseImage;
+				if (inputImage == null)
+				{
+					//一般第一个组就会变成这种情况，会作为base图片处理
+					baseImage = new ImageOpen(file);
+				}
+				else
+				{
+					var diffImage = new ImageOpen(file);
+					//baseImage = inputImage.Clone();
+					baseImage = PicMerger.Merger(inputImage, diffImage,int.Parse(GlobalScheme.MergerComboSelect));
+				}
+
+				if (needListLen > 1)
+				{
+
+					ListXListAndMerge(merger_lists, needListLen - 1, baseImage);
+				}
+				else
+				{
+					if (true)
+					{
+						baseImage.Save();
+					}
+				}
+				baseImage.Close();
+			}
+
+			
+		}
+	}
 }

@@ -42,14 +42,21 @@ namespace DM_CS.GUI
 
     }
 
-
+	/// <summary>
+	/// 正则匹配的相关数据
+	/// </summary>
     internal static class RegexMatchAll
     {
         public static int MatchFileCount { get { return MatchFiles.Count; } }
 
-        //这个用来做合成时的匹配字典
-        public static Dictionary<string, string> MatchFiles = new Dictionary<string, string>();
+		/// <summary>
+		/// 这个用来做合成时的匹配字典
+		/// </summary>
+		public static Dictionary<string, string> MatchFiles = new Dictionary<string, string>();
 
+		/// <summary>
+		/// 文件列表（一个key对应的）
+		/// </summary>
         public static Dictionary<string, List<string>> FilesOfKey = new Dictionary<string, List<string>>();
 
         //一个主key对应Group数量的string[]，依靠字典筛选

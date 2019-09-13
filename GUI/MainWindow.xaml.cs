@@ -74,6 +74,11 @@ namespace DM_CS.GUI
             Dispatcher.Invoke(() => { StatusBarTextBlock.Text = text.Trim(); });
         }
 
+		/// <summary>
+		/// 合成按钮
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void button_Merge(object sender, RoutedEventArgs e)
         {
             if (GlobalScheme.IsRegexMode)
@@ -86,7 +91,8 @@ namespace DM_CS.GUI
                         var tempStrings = RegexMatchAll.MergeSchemeList[itemKey][groupID];
                         merger_lists.Add(tempStrings);
                     }
-                    Merger(merger_lists);
+					//上面和下面的注释情况差不多的，具体实现功能已经完善，除去后续追加的图片可有无状态不需要更改
+					ListXListAndMerge(merger_lists, merger_lists.Count);
                 }
             }
             else
@@ -94,13 +100,20 @@ namespace DM_CS.GUI
                 var merger_lists = new List<string[]>();
                 foreach (var group in GlobalScheme.GroupDictList)
                 {
-                    var tempStrings = group.Value.Dict.Values.ToArray();
+					//提取每个组的文件，转换成string[]类型，添加进string[]列表
+					var tempStrings = group.Value.Dict.Values.ToArray();
                     merger_lists.Add(tempStrings);
                 }
-                Merger(merger_lists);
+				ListXListAndMerge(merger_lists, merger_lists.Count);
             }
         }
 
+
+		/// <summary>
+		/// 改变了合成方式
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void box_MergerStyleChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBoxItem getCB = mergerComboBox.SelectedItem as ComboBoxItem;
@@ -129,6 +142,11 @@ namespace DM_CS.GUI
             }
         }
 
+		/// <summary>
+		/// 按下左下角的R按钮
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void button_regexMain(object sender, RoutedEventArgs e)
         {
             if (!GlobalScheme.IsRegexMode)

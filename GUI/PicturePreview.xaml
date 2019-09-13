@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="PicturePreview" Height="600" Width="800" MinWidth="200" MinHeight="150" Closed="ClosePicturePreview" Loaded="PreviewLoad" SizeChanged="ChangeWinSize">
     <Grid Background="#FFE6E6E6">
-        <TextBox x:Name="scale" HorizontalAlignment="Left" Height="23" Margin="58,2,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="55"/>
+        <TextBox x:Name="scale" HorizontalAlignment="Left" Height="23" Margin="58,2,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="55" UndoLimit="2" MaxLines="1" MaxLength="5" KeyDown="inputScale" LostKeyboardFocus="inputScaleComplete"/>
         <ScrollViewer x:Name="preview" Margin="10,30,10,10" HorizontalScrollBarVisibility="Auto" RenderTransformOrigin="0.491,0.506">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar">
