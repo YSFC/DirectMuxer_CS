@@ -56,7 +56,7 @@
                 <ComboBoxItem Content="Alpha" Tag="1"/>
                 <ComboBoxItem Content="Color" Tag="2"/>
                 <ComboBoxItem Content="Override" Tag="3"/>
-                <ComboBoxItem Content="None" Tag="4"/>
+                <ComboBoxItem Content="EgdeDetect" Tag="4"/>
             </ComboBox>
             <Menu x:Name="menu1" VerticalAlignment="Center" DockPanel.Dock="Top" Height="22" Width="70" Margin="0,12,0,0" HorizontalAlignment="Center">
                 <MenuItem Header="Group" Width="70">
