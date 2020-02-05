@@ -323,7 +323,7 @@ namespace DM_CS.PictureCore
 					outPic = null;
 					break;
 			}
-
+			outPic.MergedCount = basePic.MergedCount + 1;
 			return outPic;
 		}
 

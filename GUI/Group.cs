@@ -30,7 +30,7 @@ namespace DM_CS.GUI
             var tempGroup = new MyGourp(GlobalScheme.GroupID);
             tempGroup.MyControl.Drop += GroupDrop;
             tempGroup.MyControl.SelectionChanged += PreviewMerger;
-            tempGroup.MyTB_Button.Click += ClickR;
+            tempGroup.GroupRegexButton.Click += ClickR;
             //listview
             Thickness tempMargin = tempGroup.MyControl.Margin;
             if (GroupDock.Children.Count != 0)
@@ -42,10 +42,10 @@ namespace DM_CS.GUI
                 tempMargin.Left = 0;
             }
             tempGroup.MyControl.Margin = tempMargin;
-            tempGroup.MyTB.Margin = tempMargin;
+            tempGroup.GroupRegexTextBox.Margin = tempMargin;//ChangeGroupSize还会调整一次
 
-            //计算的单group框宽度
-            int groupWidth = Convert.ToInt32((Width - 332) / (GroupDock.Children.Count + 1)) - 10;      
+			//计算的单group框宽度
+			int groupWidth = Convert.ToInt32((Width - 332) / (GroupDock.Children.Count + 1)) - 10;      
             tempGroup.Colum.Width = groupWidth - 10;
 
             GlobalScheme.GroupID += 1;
@@ -54,10 +54,11 @@ namespace DM_CS.GUI
             StatusPrint(string.Format("Group{0}已添加", GlobalScheme.GroupID));
             
             GroupDock.Children.Add(tempGroup.MyControl);
-            RegexDock.Children.Add(tempGroup.MyTB);
-            RegexDock.Children.Add(tempGroup.MyTB_Button);
+            RegexDock.Children.Add(tempGroup.GroupRegexTextBox);
+            RegexDock.Children.Add(tempGroup.GroupRegexButton);
+			RegexDock.Children.Add(tempGroup.MustNeedChecBox);
 
-            ChangeGroupSize();
+			ChangeGroupSize();
         }
 
         private void ChangeGroupSize()
@@ -76,7 +77,7 @@ namespace DM_CS.GUI
             {
                 if (i.GetType() == typeof(TextBox))
                 {
-                    i.Width = groupWidth - 24;
+                    i.Width = groupWidth - 44;
                 }
             }
         }
@@ -143,7 +144,7 @@ namespace DM_CS.GUI
                 StatusPrint("未启用正则模式。");
                 return;
             }
-            var reText = GlobalScheme.GroupDictList[ID].MyTB.Text;
+            var reText = GlobalScheme.GroupDictList[ID].GroupRegexTextBox.Text;
             if(reText == "")
             {
                 return;
@@ -188,6 +189,9 @@ namespace DM_CS.GUI
 
     }
 
+	/// <summary>
+	/// 自定义的一个Group包含的全部元素
+	/// </summary>
     internal class MyGourp
     {
 
@@ -198,14 +202,25 @@ namespace DM_CS.GUI
 		/// </summary>
         public MyGourpDict Dict { get; set; }
         public ListView MyControl { get; }
-        public TextBox MyTB { get; }
-        public Button MyTB_Button { get; }
+		/// <summary>
+		/// 每个Group下的正则表达式输入框
+		/// </summary>
+        public TextBox GroupRegexTextBox { get; }
+		/// <summary>
+		/// 正则输入框旁边的R按钮
+		/// </summary>
+        public Button GroupRegexButton { get; }
+		/// <summary>
+		/// 是否必须图片复选框
+		/// </summary>
+		public CheckBox MustNeedChecBox { get; }
         public GridViewColumn Colum { get; }
 
         public MyGourp(int ID)
         {
             this.ID = ID;
             this.Dict = new MyGourpDict();
+			//ListView相关
             this.MyControl = new ListView();
             if (GlobalScheme.IsRegexMode)
             {
@@ -218,75 +233,89 @@ namespace DM_CS.GUI
             this.MyControl.Tag = ID;
             this.MyControl.ItemsSource = this.Dict.OCKeys;
             this.MyControl.DragEnter += dm_GroupEnter;
-            this.MyControl.MouseLeftButtonDown += listview_mouseup;            
-            this.MyTB = new TextBox();
-            this.MyTB.Tag = ID;
-            this.MyTB_Button = new Button();
-            this.MyTB_Button.Tag = ID;
-            this.MyTB_Button.Content = "R";
+            this.MyControl.MouseLeftButtonDown += listview_mouseup;
 
-            //this.MyControl.Drop += dm_GroupDrop;
+			//下方输入框和按钮
+            this.GroupRegexTextBox = new TextBox();
+            this.GroupRegexTextBox.Tag = ID;
 
-            //Column生成，风格调整为左对齐
-            Colum = new GridViewColumn();
+			//Button
+            this.GroupRegexButton = new Button();
+            this.GroupRegexButton.Tag = ID;
+            this.GroupRegexButton.Content = "R";
+			this.GroupRegexButton.Width = 21;
+			this.GroupRegexButton.Height = 21;
+			Thickness tempMargin = this.GroupRegexButton.Margin;
+			tempMargin.Left = 3;
+			this.GroupRegexButton.Margin = tempMargin;
+
+			//CheckBox
+			this.MustNeedChecBox = new CheckBox();
+			this.MustNeedChecBox.Tag = ID;
+			this.MustNeedChecBox.Width = 17;
+			this.MustNeedChecBox.Height = 21;
+			var checkBoxST = new System.Windows.Media.ScaleTransform(1.1, 1.1);
+			this.MustNeedChecBox.RenderTransform = checkBoxST;
+			tempMargin = this.MustNeedChecBox.Margin;
+			tempMargin.Top = 4;
+			tempMargin.Left = 3;
+			this.MustNeedChecBox.Margin = tempMargin;
+
+			//this.MyControl.Drop += dm_GroupDrop;
+
+			//Column生成，风格调整为左对齐
+			Colum = new GridViewColumn();
             Style groupStyle = new Style(typeof(GridViewColumnHeader));
             groupStyle.Setters.Add(new Setter(GridViewColumnHeader.HorizontalContentAlignmentProperty,
                  HorizontalAlignment.Left));
             this.Colum.HeaderContainerStyle = groupStyle;
             this.Colum.Header = string.Format("Group{0}", GlobalScheme.GroupID + 1);
 
-            //button
-            this.MyTB_Button.Width = 21;
-            this.MyTB_Button.Height = 21;
-            Thickness tempMargin = this.MyTB_Button.Margin;
-            tempMargin.Left = 3;
-            this.MyTB_Button.Margin = tempMargin;
+
 
             //ContextMenu
-            ContextMenu tempCM = new ContextMenu();
-            var tempMI1 = new MenuItem();
-            tempMI1.Header = "删除";
-            tempCM.Items.Add(tempMI1);
-			tempMI1.Click += mi_Remove;
-			var tempMI2 = new MenuItem();
-            tempMI2.Header = "清空";
-            tempMI2.Click += mi_Clear;
-            tempCM.Items.Add(tempMI2);
-            this.MyControl.ContextMenu = tempCM;
+            ContextMenu contextMenu = new ContextMenu();
+            var menuItemDelete = new MenuItem();
+            menuItemDelete.Header = "删除";
+            contextMenu.Items.Add(menuItemDelete);
+            var menuItemClear = new MenuItem();
+            menuItemClear.Header = "清空";
+            menuItemClear.Click += mi_Clear;
+            contextMenu.Items.Add(menuItemClear);
+            this.MyControl.ContextMenu = contextMenu;
 
             //GridView
             var tempView = new GridView();
             tempView.Columns.Add(Colum);
             this.MyControl.View = tempView;
         }
-
+		/// <summary>
+		/// 本Grou成为为焦点
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void dm_GroupEnter(object sender, DragEventArgs e)
         {
             GlobalScheme.FoucsGourpID = this.ID;
         }
 
-        //清空 选项
-        private void mi_Clear(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// 清空 选项
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void mi_Clear(object sender, RoutedEventArgs e)
         {
             this.Dict.Clear();
         }
 
-		//删除 选项
-		private void mi_Remove(object sender, RoutedEventArgs e)
-		{
-			foreach(var key in this.MyControl.SelectedItems.Cast<string>().ToList())
-			{
-				this.Dict.Remove(key);
-			}
-		}
-
-		private void listview_mouseup(object sender, MouseButtonEventArgs e)
+        private void listview_mouseup(object sender, MouseButtonEventArgs e)
         {
             this.MyControl.SelectedIndex = -1;
         }
     }
     /// <summary>
-    /// Group专用
+    /// Group专用自定义字典
     /// </summary>
     public class MyGourpDict : Dictionary<string, string>
     {
@@ -304,13 +333,7 @@ namespace DM_CS.GUI
             base.Clear();
             OCKeys.Clear();
         }
-
-		public new void Remove(string key)
-		{
-			base.Remove(key);
-			OCKeys.Remove(key);
-		}
-	}
+    }
 
     [Serializable]
     public class ExistsInGroupException : Exception

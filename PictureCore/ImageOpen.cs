@@ -29,6 +29,10 @@ namespace DM_CS.PictureCore
         public MagickImage Pic { get { return m_pic; } }
         public bool IsPicture { get { return m_format != null; } }
         public long PicMemorySize { get { return GetPicMemorySize(); } }
+		/// <summary>
+		/// 合成次数统计
+		/// </summary>
+		public int MergedCount { get; set; }
 
         private void ImageInfoSet(FileStream file)
         {
@@ -76,7 +80,8 @@ namespace DM_CS.PictureCore
             m_pic = im_pic;
             m_offset[0] = offset[0];
             m_offset[1] = offset[1];
-        }
+			MergedCount = 0;
+		}
 
         public ImageOpen(MagickImage im_pic, int[] offset,string out_filename) : this(im_pic, offset)
         {

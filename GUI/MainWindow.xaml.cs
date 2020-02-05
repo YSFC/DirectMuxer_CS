@@ -86,25 +86,29 @@ namespace DM_CS.GUI
                 foreach(var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x=>x))
                 {
                     var merger_lists = new List<string[]>();
+					var mustNeedInfoList = new List<bool?>();
                     foreach (var groupID in RegexMatchAll.MergeSchemeList[itemKey].Keys.OrderBy(x => x))
                     {
                         var tempStrings = RegexMatchAll.MergeSchemeList[itemKey][groupID];
                         merger_lists.Add(tempStrings);
-                    }
+						mustNeedInfoList.Add(GlobalScheme.GroupDictList[groupID].MustNeedChecBox.IsChecked);
+					}
 					//上面和下面的注释情况差不多的，具体实现功能已经完善，除去后续追加的图片可有无状态不需要更改
-					ListXListAndMerge(merger_lists, merger_lists.Count);
+					ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
                 }
             }
             else
             {
                 var merger_lists = new List<string[]>();
-                foreach (var group in GlobalScheme.GroupDictList)
+				var mustNeedInfoList = new List<bool?>();
+				foreach (var group in GlobalScheme.GroupDictList)
                 {
 					//提取每个组的文件，转换成string[]类型，添加进string[]列表
 					var tempStrings = group.Value.Dict.Values.ToArray();
                     merger_lists.Add(tempStrings);
-                }
-				ListXListAndMerge(merger_lists, merger_lists.Count);
+					mustNeedInfoList.Add(group.Value.MustNeedChecBox.IsChecked);
+				}
+				ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
             }
         }
 
