@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.IO;
 using System.Windows.Controls;
-using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -40,7 +40,12 @@ namespace DM_CS.GUI
         //图片预览窗口所使用的BitmapSource，初始应与图片控件绑定
         public static BitmapSource PreviewBS;
 
-    }
+		/// <summary>
+		/// 本次合成统计
+		/// </summary>
+		public static long MergedCount;
+
+	}
 
 	/// <summary>
 	/// 正则匹配的相关数据
@@ -82,4 +87,5 @@ namespace DM_CS.GUI
             return getCount;
         }
     }
+
 }

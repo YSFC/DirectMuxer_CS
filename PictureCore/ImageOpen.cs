@@ -33,8 +33,12 @@ namespace DM_CS.PictureCore
 		/// 合成次数统计
 		/// </summary>
 		public int MergedCount { get; set; }
+		/// <summary>
+		/// 是否保存过标识
+		/// </summary>
+		public int SavedSign { get; set; }
 
-        private void ImageInfoSet(FileStream file)
+		private void ImageInfoSet(FileStream file)
         {
             try
             {
@@ -81,6 +85,7 @@ namespace DM_CS.PictureCore
             m_offset[0] = offset[0];
             m_offset[1] = offset[1];
 			MergedCount = 0;
+			SavedSign = 0;
 		}
 
         public ImageOpen(MagickImage im_pic, int[] offset,string out_filename) : this(im_pic, offset)
@@ -173,7 +178,8 @@ namespace DM_CS.PictureCore
                 outBMP.Save(FileName,ImageFormat.Bmp);
                 outBMP.Dispose();
             }
-        }
+			this.SavedSign = 1;
+		}
 
         public BitmapSource GetBitmap()
         {

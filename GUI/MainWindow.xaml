@@ -6,7 +6,21 @@
         xmlns:local="clr-namespace:DM_CS"
         mc:Ignorable="d"
         Title="DirectMuxer_CS" Height="450" Width="800" MinWidth="800" MinHeight="450" SizeChanged="EvGourpSizeChanged" Loaded="Load" Closing="SaveSettings">
-
+    <Window.Resources>
+        <RoutedUICommand x:Key="ClearAllGroup" Text="ClearAllGroup"/>
+        <RoutedUICommand x:Key="ClearGroup" Text="ClearGroup"/>
+        <RoutedUICommand x:Key="Merge" Text="Merge"/>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+Shift+W" Command="{StaticResource ClearAllGroup}"></KeyBinding>
+        <KeyBinding Gesture="Ctrl+W" Command="{StaticResource ClearGroup}"></KeyBinding>
+        <KeyBinding Gesture="Ctrl+A" Command="{StaticResource Merge}"></KeyBinding>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource ClearAllGroup}" CanExecute="EvClearAllGroup"></CommandBinding>
+        <CommandBinding Command="{StaticResource ClearGroup}" CanExecute="EvClearGroup"></CommandBinding>
+        <CommandBinding Command="{StaticResource Merge}" CanExecute="button_Merge"></CommandBinding>
+    </Window.CommandBindings>
     <Grid Background="#FFE6E6E6">
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -22,10 +36,10 @@
                 <MenuItem x:Name="ExitMenuItem" Header="Exit" Click="Exit"/>
             </MenuItem>
             <MenuItem Header="操作">
-                <MenuItem x:Name="ClearAllGroup" Header="Group Clear" Click="EvClearAllGroupMI"/>
+                <MenuItem x:Name="ClearAllGroup" Header="Group Clear" Click="EvClearAllGroup"/>
                 <MenuItem IsChecked="True" Header="禁用alpha预乘(暂时无用)" IsCheckable="True"/>
                 <Separator/>
-                <MenuItem x:Name="openPicturePreview_MeanItem" Header="Open picture preview" IsCheckable="True" Checked="OpenPicturePreview"/>
+                <MenuItem x:Name="openPicturePreview_MeanItem" Header="Open picture preview" IsCheckable="True" Checked="OpenPicturePreview" Unchecked="ClosePicturePreview"/>
             </MenuItem>
             <MenuItem Header="About" Click="AboutBoxOpen"/>
         </Menu>

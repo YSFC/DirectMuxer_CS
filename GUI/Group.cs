@@ -201,6 +201,9 @@ namespace DM_CS.GUI
 		/// 自定义的组字典
 		/// </summary>
         public MyGourpDict Dict { get; set; }
+		/// <summary>
+		/// ListView控件实体
+		/// </summary>
         public ListView MyControl { get; }
 		/// <summary>
 		/// 每个Group下的正则表达式输入框
@@ -232,8 +235,10 @@ namespace DM_CS.GUI
             }
             this.MyControl.Tag = ID;
             this.MyControl.ItemsSource = this.Dict.OCKeys;
-            this.MyControl.DragEnter += dm_GroupEnter;
-            this.MyControl.MouseLeftButtonDown += listview_mouseup;
+            this.MyControl.MouseEnter += GroupEnter;
+			this.MyControl.MouseLeave += GroupLevae;
+
+			this.MyControl.MouseLeftButtonDown += listview_mouseup;
 
 			//下方输入框和按钮
             this.GroupRegexTextBox = new TextBox();
@@ -277,10 +282,11 @@ namespace DM_CS.GUI
             ContextMenu contextMenu = new ContextMenu();
             var menuItemDelete = new MenuItem();
             menuItemDelete.Header = "删除";
-            contextMenu.Items.Add(menuItemDelete);
+			menuItemDelete.Click += GroupDelete;
+			contextMenu.Items.Add(menuItemDelete);
             var menuItemClear = new MenuItem();
             menuItemClear.Header = "清空";
-            menuItemClear.Click += mi_Clear;
+            menuItemClear.Click += GroupClear;
             contextMenu.Items.Add(menuItemClear);
             this.MyControl.ContextMenu = contextMenu;
 
@@ -294,22 +300,46 @@ namespace DM_CS.GUI
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-        private void dm_GroupEnter(object sender, DragEventArgs e)
+        private void GroupEnter(object sender, MouseEventArgs e)
         {
             GlobalScheme.FoucsGourpID = this.ID;
         }
+
+		/// <summary>
+		/// 失去焦点
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void GroupLevae(object sender, MouseEventArgs e)
+		{
+			GlobalScheme.FoucsGourpID = -1;
+		}
 
 		/// <summary>
 		/// 清空 选项
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void mi_Clear(object sender, RoutedEventArgs e)
+		private void GroupClear(object sender, RoutedEventArgs e)
         {
-            this.Dict.Clear();
-        }
+			this.Dict.Clear();
+		}
 
-        private void listview_mouseup(object sender, MouseButtonEventArgs e)
+		/// <summary>
+		/// 删除 选项
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void GroupDelete(object sender, RoutedEventArgs e)
+		{
+			var tempList = this.MyControl.SelectedItems.Cast<string>().ToList();
+			foreach (var key in tempList)
+			{
+				this.Dict.Remove((string)key);
+			}
+		}
+
+		private void listview_mouseup(object sender, MouseButtonEventArgs e)
         {
             this.MyControl.SelectedIndex = -1;
         }
@@ -327,8 +357,12 @@ namespace DM_CS.GUI
             base.Add(key, value);
             OCKeys.Add(key);
         }
-
-        public new void Clear()
+		public new void Remove(string key)
+		{
+			base.Remove(key);
+			OCKeys.Remove(key);
+		}
+		public new void Clear()
         {
             base.Clear();
             OCKeys.Clear();

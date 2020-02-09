@@ -81,7 +81,9 @@ namespace DM_CS.GUI
 		/// <param name="e"></param>
         private void button_Merge(object sender, RoutedEventArgs e)
         {
-            if (GlobalScheme.IsRegexMode)
+			GlobalScheme.MergedCount = 0;
+
+			if (GlobalScheme.IsRegexMode)
             {
                 foreach(var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x=>x))
                 {
@@ -110,6 +112,8 @@ namespace DM_CS.GUI
 				}
 				ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
             }
+
+			StatusPrint(string.Format("合成完毕：成功合成{0}张", GlobalScheme.MergedCount.ToString()));
         }
 
 
@@ -276,7 +280,7 @@ namespace DM_CS.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EvClearAllGroupMI(object sender, RoutedEventArgs e)
+        private void EvClearAllGroup(object sender, RoutedEventArgs e)
         {
             foreach(var i in GlobalScheme.GroupDictList)
             {
@@ -284,12 +288,25 @@ namespace DM_CS.GUI
             }
         }
 
-        /// <summary>
-        /// 保存设置
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveSettings(object sender, System.ComponentModel.CancelEventArgs e)
+		/// <summary>
+		/// 清空焦点Group内元素
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void EvClearGroup(object sender, RoutedEventArgs e)
+		{
+			if (GlobalScheme.FoucsGourpID != -1)
+			{
+				GlobalScheme.GroupDictList[GlobalScheme.FoucsGourpID].Dict.Clear();
+			}
+		}
+
+		/// <summary>
+		/// 保存设置
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SaveSettings(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (GlobalScheme.PicturePreviewWindow != null && GlobalScheme.PicturePreviewWindow.IsVisible)
             {

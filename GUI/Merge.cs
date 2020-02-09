@@ -123,14 +123,21 @@ namespace DM_CS.GUI
 				{
 					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
 				}
-				else if (inputImage != null)
+				else if (inputImage != null && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
 				{
 					inputImage.Save();
+					GlobalScheme.MergedCount++;
 				}
 				else
 				{
 					StatusPrint("请输入图片！");
 				}
+			}
+
+			//如果这个Grou非必选，要分开原图和合成后图片处理
+			if (merger_lists[merger_lists.Count - needListLen].Count() != 0 && mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage != null)
+			{
+				ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
 			}
 
 			foreach (var file in merger_lists[merger_lists.Count - needListLen])
@@ -150,27 +157,24 @@ namespace DM_CS.GUI
 
 				if (needListLen > 1)
 				{
-					//如果这个Grou非必选，要分开原图和合成后图片处理
-					if (mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage != null)
-					{
-						ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
-					}
 					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, baseImage);
 				}
 				else
 				{
 					
-					if (baseImage.MergedCount > 0)
+					if (baseImage.MergedCount > 0 && baseImage.SavedSign == 0)
 					{
 						baseImage.Save();
+						GlobalScheme.MergedCount++;
 					}
-					if (mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage.MergedCount > 0)
+					if (mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
 					{
 						inputImage.Save();
+						GlobalScheme.MergedCount++;
 					}
 				}
 				baseImage.Close();
-			}
+			}			
 		}
 	}
 }
