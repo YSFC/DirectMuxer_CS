@@ -130,8 +130,10 @@ namespace DM_CS.PictureCore
 				for (var pixelY = 0; pixelY < picHeight; pixelY += RH)
 				{
 					var SW_e = 1;
+					var tempInt = 0;
 					for (var pixelX = 0; pixelX < picWidth; pixelX++)
 					{
+						tempInt++;
 						var pixel = picPixelC.GetPixel(pixelX, pixelY);
 
 						if (SW_e == 1 && pixel[3] > 250)
@@ -145,6 +147,9 @@ namespace DM_CS.PictureCore
 							eList.Add(new int[] { pixelX - 1, pixelY });
 							break;
 						}
+					}
+					if (tempInt == picWidth - 1) {
+						eList.Add(new int[] { picWidth, pixelY });
 					}
 				}
 			}
@@ -193,15 +198,15 @@ namespace DM_CS.PictureCore
 			var A_EC = 99999;
 
 
-			for (var baseY = 0; baseY < baseHeight - faceHeight; baseY++) {
+			for (var baseY = 0; baseY < baseHeight - faceHeight+1; baseY++) {
 
-				for (var baseX = 0; baseX < baseWidth - faceWidth; baseX++)
+				for (var baseX = 0; baseX < baseWidth - faceWidth +1; baseX++)
 				{
 					var sameCount = 0;
 					foreach (var info in faceEList)
 					{
 						var B_XY = new int[] { baseX + info[0], baseY + info[1] };
-						
+
 						//这边本来是python的RC，也就是容差进行一个容错，不过这边直接按完全一致考虑，所以修改了。
 						//由于以后不知道怎么设计，姑且保留目前情况是冗余的部分。
 						var bP = basePixels.GetPixel(B_XY[0], B_XY[1]);
@@ -213,7 +218,7 @@ namespace DM_CS.PictureCore
 						else
 						{
 							//如果匹配的是边缘，可能没法一致，但可以忽略这些不同
-							if (B_XY.Contains(0) || B_XY[0] == baseX - 1 || B_XY[1] == baseY - 1)
+							if (B_XY.Contains(0) || B_XY[0] == baseWidth - 1 || B_XY[1] == baseHeight - 1)
 							{
 								sameCount += 1;
 								continue;

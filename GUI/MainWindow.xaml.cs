@@ -85,6 +85,10 @@ namespace DM_CS.GUI
 
 			if (GlobalScheme.IsRegexMode)
             {
+				foreach(MyGourp item in GroupDock.Children)
+				{
+					ClickR(item.GroupRegexButton, e);
+				}
                 foreach(var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x=>x))
                 {
                     var merger_lists = new List<string[]>();
@@ -113,7 +117,8 @@ namespace DM_CS.GUI
 				ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
             }
 
-			StatusPrint(string.Format("合成完毕：成功合成{0}张", GlobalScheme.MergedCount.ToString()));
+			StatusPrint(string.Format("成功合成{0}张", GlobalScheme.MergedCount.ToString()));
+			EvClearAllGroup(sender, e);
         }
 
 

@@ -115,7 +115,10 @@ namespace DM_CS.GUI
 				//needListLen必定大于等于1，不然就是index超出范围
 				throw new IndexOutOfRangeException("卧槽怎么做到0个group合成的？");
 			}
-
+			if (merger_lists[0].Count() == 0 && GlobalScheme.IsRegexMode)
+			{
+				return;//正则模式下，第一位图片为空就不合成，避免出现奇怪的合成（第二第三合出一个只有头那种）
+			}
 			//如果中间某个列表为空，会造成无法处理后续列表的情况
 			if (merger_lists[merger_lists.Count - needListLen].Count() == 0)
 			{
@@ -137,7 +140,10 @@ namespace DM_CS.GUI
 			//如果这个Grou非必选，要分开原图和合成后图片处理
 			if (merger_lists[merger_lists.Count - needListLen].Count() != 0 && mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage != null)
 			{
-				ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
+				if (needListLen > 1)
+				{
+					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
+				}
 			}
 
 			foreach (var file in merger_lists[merger_lists.Count - needListLen])
