@@ -16,6 +16,8 @@ namespace DM_CS.PictureCore
         public static string OutputDir = ".";
         public static string ColorKey = "#000000";
         public static int OutFormat = 0;
+        public static int MaxThread = 0;
+        public static bool PAChecked = true;
 
         public static string[] FormatList = new string[] { ".bmp", ".png", ".jpg" };
         static Scheme()
@@ -31,6 +33,7 @@ namespace DM_CS.PictureCore
             OutputDir = GetKey("OutputDir", config_manager, ".");
             ColorKey = GetKey("ColorKey", config_manager, "#000000");
             OutFormat = int.Parse(GetKey("OutFormat", config_manager, "0"));
+            MaxThread = int.Parse(GetKey("MaxThread", config_manager, "1"));
         }
 
         public static void Save()
@@ -41,6 +44,7 @@ namespace DM_CS.PictureCore
             AddKey("OutputDir", ref config_manager, OutputDir);
             AddKey("ColorKey", ref config_manager, ColorKey);
             AddKey("OutFormat", ref config_manager, OutFormat.ToString());
+            AddKey("MaxThread", ref config_manager, MaxThread.ToString());
             config_manager.Save();
         }
 

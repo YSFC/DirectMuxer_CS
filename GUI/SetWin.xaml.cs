@@ -27,6 +27,7 @@ namespace DM_CS.GUI
             ColorKey.Text = PictureCore.Scheme.ColorKey;
             OffsetModeCB.SelectedIndex = PictureCore.Scheme.OffsetMode;
             OutFormatCB.SelectedIndex = PictureCore.Scheme.OutFormat;
+            comboBox_MaxThread.SelectedIndex = PictureCore.Scheme.MaxThread - 1;
         }
 
         private void EvOutPathKeyDown(object sender, KeyEventArgs e)
@@ -89,6 +90,7 @@ namespace DM_CS.GUI
             PictureCore.Scheme.OutFormat = int.Parse((OutFormatCB.SelectedItem as ComboBoxItem).Tag.ToString());
             PictureCore.Scheme.OutputDir = DirTextBox.Text;
             PictureCore.Scheme.ColorKey = ColorKey.Text;
+            PictureCore.Scheme.MaxThread = int.Parse((string)(comboBox_MaxThread.SelectedItem as ComboBoxItem).Content);
 
             this.Close();
         }

@@ -37,6 +37,10 @@ namespace DM_CS.PictureCore
 		/// 是否保存过标识
 		/// </summary>
 		public int SavedSign { get; set; }
+		/// <summary>
+		/// 是否预乘过标识
+		/// </summary>
+		public bool PremultipliedAlphaSign { get; set; }
 
 		private void ImageInfoSet(FileStream file)
 		{
@@ -52,14 +56,34 @@ namespace DM_CS.PictureCore
 					{
 						file.Seek(10, SeekOrigin.Begin);
 						var tempIntBytes = new byte[4];
+						
 						file.Read(tempIntBytes, 0, 4);
 						var tempInt = BitConverter.ToUInt32(tempIntBytes, 0);
+
+						file.Seek(28, SeekOrigin.Begin);
+						file.Read(tempIntBytes, 0, 2);
+						var tempDeep = BitConverter.ToUInt16(tempIntBytes, 0);
+						if (tempDeep != 32)
+						{
+							throw new Exception("Not32Deep");
+						}
+
 						file.Seek(tempInt, SeekOrigin.Begin);
-						var dataLen = m_pic_temp.Width * m_pic_temp.Height * 4;
+						var dataLen = m_pic_temp.Width * m_pic_temp.Height * 4;//因为位深4，不需要做4字节对齐处理
 						var data = new byte[dataLen];
 						file.Read(data, 0, dataLen);
-						var prs = new PixelReadSettings(m_pic_temp.Width, m_pic_temp.Height, StorageType.Char, PixelMapping.RGBA);
+						var prs = new PixelReadSettings(m_pic_temp.Width, m_pic_temp.Height, StorageType.Int32, PixelMapping.RGBA);
 						m_pic_temp = new MagickImage(data, prs);
+						
+						//处理下颜色被交换问题（没有BGRA这种读取模式）
+						var tempPixels = m_pic_temp.GetPixels();
+						foreach(var pixel in tempPixels)
+						{
+							var tempP = pixel[0];
+							pixel[0] = pixel[2];
+							pixel[2] = tempP;
+						}
+						
 					}
 					catch(Exception ex)
 					{
@@ -109,6 +133,7 @@ namespace DM_CS.PictureCore
 			m_offset[1] = offset[1];
 			MergedCount = 0;
 			SavedSign = 0;
+			PremultipliedAlphaSign = false;
 		}
 
 		public ImageOpen(MagickImage im_pic, int[] offset, string out_filename) : this(im_pic, offset)

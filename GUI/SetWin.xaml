@@ -25,6 +25,13 @@
                     <TextBox x:Name="ColorKey" HorizontalAlignment="Left" Height="23" Margin="230,69,0,0" TextWrapping="Wrap" Text="#FFFFFF" VerticalAlignment="Top" Width="120"/>
                     <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="124,72,0,0" TextWrapping="Wrap" Text="T模式颜色" VerticalAlignment="Top"/>
                     <Button x:Name="button1" Content="C" HorizontalAlignment="Left" Margin="364,72,0,0" VerticalAlignment="Top" Width="30" Click="EvColorChooseClick"/>
+                    <ComboBox x:Name="comboBox_MaxThread" HorizontalAlignment="Left" Margin="230,183,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0">
+                        <ComboBoxItem Content="1" HorizontalAlignment="Left" Width="118"/>
+                        <ComboBoxItem Content="2" HorizontalAlignment="Left" Width="118"/>
+                        <ComboBoxItem Content="3" HorizontalAlignment="Left" Width="118"/>
+                        <ComboBoxItem Content="4" HorizontalAlignment="Left" Width="118"/>
+                    </ComboBox>
+                    <TextBlock x:Name="textBlock_MaxThread" HorizontalAlignment="Left" Margin="124,183,0,0" TextWrapping="Wrap" Text="线程数:" VerticalAlignment="Top" Height="22"/>
                 </Grid>
             </TabItem>
             <TabItem Header="OutPath" Height="30">

@@ -7,7 +7,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.IO;
 using System.Configuration;
-using SWF = System.Windows.Forms; 
+using SWF = System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
+using DM_CS.PictureCore;
 
 namespace DM_CS.GUI
 {
@@ -74,51 +77,81 @@ namespace DM_CS.GUI
             Dispatcher.Invoke(() => { StatusBarTextBlock.Text = text.Trim(); });
         }
 
-		/// <summary>
-		/// 合成按钮
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+        /// <summary>
+        /// 合成按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button_Merge(object sender, RoutedEventArgs e)
         {
-			GlobalScheme.MergedCount = 0;
-
-			if (GlobalScheme.IsRegexMode)
+            if (workingCount != 0)
             {
-				foreach(MyGourp item in GroupDock.Children)
-				{
-					ClickR(item.GroupRegexButton, e);
-				}
-                foreach(var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x=>x))
+                StatusPrint("在处理中。。。");
+                return;
+            }
+            GlobalScheme.MergedCount = 0;
+            GlobalScheme.MergedErrorCount = 0;
+
+            workingCount++;
+            semaphore = new Semaphore(Scheme.MaxThread, Scheme.MaxThread);
+            if (GlobalScheme.IsRegexMode)
+            {
+                foreach (MyGourp item in GroupDock.Children)
+                {
+                    ClickR(item.GroupRegexButton, e);
+                }
+                foreach (var itemKey in RegexMatchAll.MergeSchemeList.Keys.OrderBy(x => x))
                 {
                     var merger_lists = new List<string[]>();
-					var mustNeedInfoList = new List<bool?>();
+                    var mustNeedInfoList = new List<bool?>();
                     foreach (var groupID in RegexMatchAll.MergeSchemeList[itemKey].Keys.OrderBy(x => x))
                     {
                         var tempStrings = RegexMatchAll.MergeSchemeList[itemKey][groupID];
                         merger_lists.Add(tempStrings);
-						mustNeedInfoList.Add(GlobalScheme.GroupDictList[groupID].MustNeedChecBox.IsChecked);
-					}
-					//上面和下面的注释情况差不多的，具体实现功能已经完善，除去后续追加的图片可有无状态不需要更改
-					ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
+                        mustNeedInfoList.Add(GlobalScheme.GroupDictList[groupID].MustNeedChecBox.IsChecked);
+                    }
+                    //上面和下面的注释情况差不多的，具体实现功能已经完善，除去后续追加的图片可有无状态不需要更改
+                    Task.Run(new Action(() => { ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count); workingCount--; }));
                 }
             }
             else
             {
                 var merger_lists = new List<string[]>();
-				var mustNeedInfoList = new List<bool?>();
-				foreach (var group in GlobalScheme.GroupDictList)
+                var mustNeedInfoList = new List<bool?>();
+                foreach (var group in GlobalScheme.GroupDictList)
                 {
-					//提取每个组的文件，转换成string[]类型，添加进string[]列表
-					var tempStrings = group.Value.Dict.Values.ToArray();
+                    //提取每个组的文件，转换成string[]类型，添加进string[]列表
+                    var tempStrings = group.Value.Dict.Values.ToArray();
                     merger_lists.Add(tempStrings);
-					mustNeedInfoList.Add(group.Value.MustNeedChecBox.IsChecked);
-				}
-				ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count);
+                    mustNeedInfoList.Add(group.Value.MustNeedChecBox.IsChecked);
+                }
+                Task.Run(new Action(() => { ListXListAndMerge(merger_lists, mustNeedInfoList, merger_lists.Count); workingCount--; }));
             }
 
-			StatusPrint(string.Format("成功合成{0}张", GlobalScheme.MergedCount.ToString()));
-			EvClearAllGroup(sender, e);
+            Task.Run(new Action(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(500);
+                    if (workingCount == 0)
+                    {                     
+                        break;
+                    }
+                }
+                if(GlobalScheme.MergedCount == 0 && GlobalScheme.MergedErrorCount == 0)
+                {
+                    //不用做什么，有提示的
+                }
+                else if (GlobalScheme.MergedErrorCount == 0)
+                {
+                    StatusPrint(string.Format("成功合成{0}张", GlobalScheme.MergedCount.ToString()));
+                }
+                else
+                {
+                    StatusPrint(string.Format("成功合成{0}张，合成失败{1}张", GlobalScheme.MergedCount.ToString(), GlobalScheme.MergedErrorCount.ToString()));
+                }
+                EvClearAllGroup(sender, e);
+            }));
         }
 
 
@@ -287,10 +320,14 @@ namespace DM_CS.GUI
         /// <param name="e"></param>
         private void EvClearAllGroup(object sender, RoutedEventArgs e)
         {
-            foreach(var i in GlobalScheme.GroupDictList)
+            this.Dispatcher.Invoke(new Action(() =>
             {
-                i.Value.Dict.Clear();
-            }
+                foreach (var i in GlobalScheme.GroupDictList)
+                {
+                    i.Value.Dict.Clear();
+                }
+            }));
+           
         }
 
 		/// <summary>
@@ -350,6 +387,15 @@ namespace DM_CS.GUI
             GlobalScheme.PicturePreviewWindow.Close();
             GlobalScheme.PicturePreviewWindow = null;
             //openPicturePreview_MeanItem.IsChecked = false;
+        }
+        /// <summary>
+        /// 可能修改了PA标识状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangedPA(object sender, RoutedEventArgs e)
+        {
+            Scheme.PAChecked = CheckPremultipliedAlpha.IsChecked;
         }
 
         /*private void btnFile_Click(object sender, EventArgs e)

@@ -8,7 +8,7 @@
         Title="About DM_CS" Height="200" Width="400" ResizeMode="NoResize">
     <Grid Background="#FFE6E6E6">
         <Button x:Name="button" Content="确定" HorizontalAlignment="Left" Margin="307,140,0,0" VerticalAlignment="Top" Width="75" Click="EvEnter"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="125" Width="374"><Run Text="DirectMuxer_CS&#xA;&#xA;v0."/><Run Text="4"/><Run Text="&#xA;"/><LineBreak/><Run Text="https://github.com/YSFC/DirectMuxer_CS"/><LineBreak/><Run Text="&#xA;Copyright © 2019"/><Run Text="-2020"/><Run Text=" YSFC"/></TextBlock>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="125" Width="374"><Run Text="DirectMuxer_CS&#xA;&#xA;v0."/><Run Text="6"/><Run Text="&#xA;"/><LineBreak/><Run Text="https://github.com/YSFC/DirectMuxer_CS"/><LineBreak/><Run Text="&#xA;Copyright © 2019"/><Run Text="-2020"/><Run Text=" YSFC"/></TextBlock>
 
     </Grid>
 </Window>

@@ -259,6 +259,7 @@ namespace DM_CS.PictureCore
 			var t3 = A[2] == B[2];
 			return (t1 && t2 && t3);
 		}
+
 	}
 
 	public static class PicMerger
@@ -304,11 +305,27 @@ namespace DM_CS.PictureCore
 		/// <param name="diffPic"></param>
 		/// <param name="merger_scheme"></param>
 		/// <returns></returns>
-		public static ImageOpen Merger(ImageOpen basePic, ImageOpen diffPic, int merger_scheme)
+		public static ImageOpen Merger(ImageOpen basePic, ImageOpen diffPic, int merger_scheme, bool needPA = false)
 		{
 			ImageOpen outPic;
 			var offset_x = diffPic.OffsetXY[0] - basePic.OffsetXY[0];
 			var offset_y = diffPic.OffsetXY[1] - basePic.OffsetXY[1];
+
+			//PA处理
+			if (needPA)
+			{
+				if (!basePic.PremultipliedAlphaSign)
+				{
+					PremultipliedAlpha(basePic.m_pic);
+					basePic.PremultipliedAlphaSign = true;
+				}
+				if (!diffPic.PremultipliedAlphaSign)
+				{
+					PremultipliedAlpha(diffPic.m_pic);
+					diffPic.PremultipliedAlphaSign = true;
+				}
+			}
+
 
 			switch (merger_scheme)
 			{
@@ -351,6 +368,29 @@ namespace DM_CS.PictureCore
 			}
 
 			return basePic;
+		}
+
+		/// <summary>
+		/// alpha预乘用
+		/// </summary>
+		/// <param name="im"></param>
+		private static void PremultipliedAlpha(MagickImage im)
+		{
+			if (!im.HasAlpha || im.ChannelCount < 4)
+			{
+				return;
+			}
+			var pixelsGroup = im.GetPixels();
+			foreach (var pixel in pixelsGroup)
+			{
+				int newColor1 = (int)Math.Min(255, (pixel[0] * 255.0 / pixel[3]));
+				int newColor2 = (int)Math.Min(255, (pixel[1] * 255.0 / pixel[3]));
+				int newColor3 = (int)Math.Min(255, (pixel[2] * 255.0 / pixel[3]));
+
+				pixel[0] = (byte)newColor1;
+				pixel[1] = (byte)newColor2;
+				pixel[2] = (byte)newColor3;
+			}
 		}
 	}
 }

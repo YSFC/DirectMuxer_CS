@@ -45,7 +45,11 @@ namespace DM_CS.GUI
 		/// </summary>
 		public static long MergedCount;
 
-	}
+        /// <summary>
+        /// 本次合成失败统计
+        /// </summary>
+        public static long MergedErrorCount;
+    }
 
 	/// <summary>
 	/// 正则匹配的相关数据

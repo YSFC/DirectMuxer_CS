@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows;
 using DM_CS.PictureCore;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace DM_CS.GUI
 {
@@ -48,6 +50,9 @@ namespace DM_CS.GUI
 		//}
 		#endregion
 
+		internal static object locker = new object();
+		internal static int workingCount = 0;
+		internal static Semaphore semaphore = new Semaphore(Scheme.MaxThread, Scheme.MaxThread);
 		/// <summary>
 		/// 列表交叉，达到直积的效果
 		/// </summary>
@@ -110,77 +115,105 @@ namespace DM_CS.GUI
 		/// <param name="needListLen">需要处理的列表数量，主要是内部迭代用。</param>
 		internal void ListXListAndMerge(List<string[]> merger_lists, List<bool?> mustNeedInfoList, int needListLen, ImageOpen inputImage = null)
 		{
-			if (needListLen < 1)
+			semaphore.WaitOne();
+			workingCount++;
+			try
 			{
-				//needListLen必定大于等于1，不然就是index超出范围
-				throw new IndexOutOfRangeException("卧槽怎么做到0个group合成的？");
-			}
-			if (merger_lists[0].Count() == 0 && GlobalScheme.IsRegexMode)
-			{
-				return;//正则模式下，第一位图片为空就不合成，避免出现奇怪的合成（第二第三合出一个只有头那种）
-			}
-			//如果中间某个列表为空，会造成无法处理后续列表的情况
-			if (merger_lists[merger_lists.Count - needListLen].Count() == 0)
-			{
-				if (needListLen > 1)
+				if (needListLen < 1)
 				{
-					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
+					//needListLen必定大于等于1，不然就是index超出范围
+					throw new IndexOutOfRangeException("卧槽怎么做到0个group合成的？");
 				}
-				else if (inputImage != null && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
+				if (merger_lists[0].Count() == 0 && GlobalScheme.IsRegexMode)
 				{
-					inputImage.Save();
-					GlobalScheme.MergedCount++;
+					return;//正则模式下，第一位图片为空就不合成，避免出现奇怪的合成（第二第三合出一个只有头那种）
 				}
-				else
+				//如果中间某个列表为空，会造成无法处理后续列表的情况
+				if (merger_lists[merger_lists.Count - needListLen].Count() == 0)
 				{
-					StatusPrint("请输入图片！");
-				}
-			}
-
-			//如果这个Grou非必选，要分开原图和合成后图片处理
-			if (merger_lists[merger_lists.Count - needListLen].Count() != 0 && mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage != null)
-			{
-				if (needListLen > 1)
-				{
-					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage);
-				}
-			}
-
-			foreach (var file in merger_lists[merger_lists.Count - needListLen])
-			{
-				ImageOpen baseImage;
-				if (inputImage == null)
-				{
-					//一般第一个组就会变成这种情况，会作为base图片处理
-					baseImage = new ImageOpen(file);
-				}
-				else
-				{
-					var diffImage = new ImageOpen(file);
-					//baseImage = inputImage.Clone();
-					baseImage = PicMerger.Merger(inputImage, diffImage, int.Parse(GlobalScheme.MergerComboSelect));
-				}
-
-				if (needListLen > 1)
-				{
-					ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, baseImage);
-				}
-				else
-				{
-					
-					if (baseImage.MergedCount > 0 && baseImage.SavedSign == 0)
+					if (needListLen > 1)
 					{
-						baseImage.Save();
-						GlobalScheme.MergedCount++;
+						Task.Run(new Action(() => ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage)));
 					}
-					if (mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
+					else if (inputImage != null && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
 					{
 						inputImage.Save();
 						GlobalScheme.MergedCount++;
 					}
+					else
+					{
+						StatusPrint("请输入图片！");
+					}
 				}
-				baseImage.Close();
-			}			
+
+				//如果这个Grou非必选，要分开原图和合成后图片处理
+				if (merger_lists[merger_lists.Count - needListLen].Count() != 0 && mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage != null)
+				{
+					if (needListLen > 1)
+					{
+						Task.Run(new Action(() => ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, inputImage)));
+					}
+				}
+
+				foreach (var file in merger_lists[merger_lists.Count - needListLen])
+				{
+					ImageOpen baseImage;
+					if (inputImage == null)
+					{
+						lock (locker)
+						{
+							//一般第一个组就会变成这种情况，会作为base图片处理
+							baseImage = new ImageOpen(file);
+						}
+					}
+					else
+					{
+						ImageOpen diffImage;
+						lock (locker)
+						{
+							diffImage = new ImageOpen(file);
+						}
+						//baseImage = inputImage.Clone();
+
+						baseImage = PicMerger.Merger(inputImage, diffImage, int.Parse(GlobalScheme.MergerComboSelect), !Scheme.PAChecked);
+					}
+
+					if (needListLen > 1)
+					{
+						Task.Run(new Action(() => ListXListAndMerge(merger_lists, mustNeedInfoList, needListLen - 1, baseImage)));
+					}
+					else
+					{
+
+						if (baseImage.MergedCount > 0 && baseImage.SavedSign == 0)
+						{
+							baseImage.Save();
+							GlobalScheme.MergedCount++;
+							//baseImage.Save();
+							StatusPrint("已合成" + GlobalScheme.MergedCount.ToString() + "张");
+						}
+						if (mustNeedInfoList[merger_lists.Count - needListLen] != true && inputImage.MergedCount > 0 && inputImage.SavedSign == 0)
+						{
+							inputImage.Save();
+							//inputImage.Save();
+							GlobalScheme.MergedCount++;
+							StatusPrint("已合成" + GlobalScheme.MergedCount.ToString() + "张");
+						}
+					}
+					//baseImage.Close();
+				}
+			}
+			catch (Exception ex)
+			{
+				var x = ex.Message;
+				GlobalScheme.MergedErrorCount++;
+			}
+			finally
+			{
+				workingCount--;
+			}
+			semaphore.Release();
+			//workingCount--;
 		}
 	}
 }
